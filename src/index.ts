@@ -17,7 +17,7 @@ app.use(cors())
 app.use(morgan('dev'))
 
 // Routes
-app.use('posts', postsRouter);
+app.use('/posts', postsRouter);
 app.get("/", (req, res) => {
   res.json({ message: "Reddit Clone API Server" });
 });
