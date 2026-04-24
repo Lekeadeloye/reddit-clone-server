@@ -14,7 +14,13 @@ interface RedditChild {
 
 postsRouter.get('/', async (req, res, next) => {
   try {
-    const response = await fetch('https://www.reddit.com/r/all.json', {
+    const sort = (req.query.sort as string) || 'best';
+    const validSorts = ['all', 'best', 'hot', 'new', 'top'];
+    const safeSort = validSorts.includes(sort) ? sort : 'all';
+
+    const url = safeSort === 'all' ? 'https://www.reddit.com/r/all/hot.json' : `https://www.reddit.com/r/all/${safeSort}.json`
+
+    const response = await fetch(url, {
       headers: {
         'User-Agent': 'MyRedditApp/1.0.0 (by /u/LekeAdeloye)'
       },
@@ -26,16 +32,17 @@ postsRouter.get('/', async (req, res, next) => {
     }
     const data = await response.json();
     const posts: RedditPost[] = data.data.children.map((child: RedditChild) => child.data)
-    const myVersionOfPosts = posts.map((post) => {
-      return {
-        id: post.id,
-        title: post.title,
-        author: post.author,
-        commentCount: post.num_comments
-      }
-    })
+    const after = data.data.after;
+    const before = data.data.before;
+
+    const dataToSend = {
+      after,
+      posts,
+      before
+    }
     // Send data to client
-    res.status(200).json(data) 
+    console.log(req.query)
+    res.status(200).json(dataToSend) 
 
   } catch (error) {
     console.error('Failed to fetch posts', error)
