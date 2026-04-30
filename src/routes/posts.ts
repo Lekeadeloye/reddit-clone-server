@@ -53,7 +53,7 @@ postsRouter.get("/", async (req, res, next) => {
   }
 });
 
-postsRouter.get("/:subReddit", async (req, res, next) => {
+postsRouter.get("/r/:subReddit", async (req, res, next) => {
   try {
     const {subReddit: subreddit} = req.params;
     const url = `https://www.reddit.com/r/${subreddit}.json`;
